@@ -1,4 +1,4 @@
-const { MongoClient } = require("mongoose");
+const { MongoClient } = require("mongodb");
 
 let client;
 let db;
@@ -8,7 +8,7 @@ async function connectDatabase() {
         client = new MongoClient(process.env.MONGO_URI, {});
         await client.connect();
         console.log(`Connected to MongoDB`);
-        db = client.db(process.env.MONGO_URI || `test`); // Database name default to test
+        db = client.db(process.env.DB_NAME || `test`); // Database name default to test
     }
     return db;
 }
