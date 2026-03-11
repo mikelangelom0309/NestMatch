@@ -18,7 +18,7 @@ const schema = buildSchema (`
         zipCode: String
     }
 
-    type User { // User model in GraphQL schema to match mongoose model
+    type User { 
         id: ID
         name: String
         email: String

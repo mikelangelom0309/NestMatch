@@ -27,9 +27,9 @@ const root = {
    async getUser({id}) {
     const user = await User.findOne({id});
     return user;
-    }
+    },
 
-    async addUser({name, email}) {
+    async addUser({ name, email }) {
         const user = new User({ name, email });
         await user.save();
         return user;
@@ -61,8 +61,6 @@ const server = new ApolloServer({
     playground: true, // Enable GraphQL Playground for testing queries
 });
 
-server.applyMiddleware({ app, path: "/graphql" }); // Apply Apollo Server middleware to Express app at /graphql endpoint
-
 app.all(
     "/graphql",
     createHandler({
@@ -73,16 +71,24 @@ app.all(
 );
 
 async function startServer() {
-    try {await connectDatabase(); // Connect to the database before starting the server
-    console.log(`Database connected successfully`);
+  try {
+    await connectDatabase();  // Wait for MongoDB connection
+    console.log("Database connected successfully");
 
+    // Start Apollo Server
+    await server.start();  // Start the server asynchronously
+
+    // Apply Apollo Server middleware to Express app
+    server.applyMiddleware({ app, path: "/graphql" });
+
+    // Start Express server
     app.listen(5001, () => {
-        console.log("Server started on PORT: 5001");
-        console.log(`GraphQL endpoint available at http://localhost:5001/graphql`);
-    }); // Listen on a Port
-} catch (error) {
-    console.error(`Error starting server:`, error);
-    }
+      console.log("Server started on PORT: 5001");
+      console.log("GraphQL endpoint available at http://localhost:5001/graphql");
+    });
+  } catch (error) {
+    console.error("Error starting server:", error); // Handle any errors during server startup
+  }
 }
 
 startServer();
