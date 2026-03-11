@@ -20,6 +20,13 @@ function getDB() {
     return db;
 }
 
+// const db = {
+//     users: [
+//         {id: 1, name: "Alice", email: "alice@example.com"}
+//     ]
+
+// }
+
 module.exports = {
     connectDatabase,
     getDB,
