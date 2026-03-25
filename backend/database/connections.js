@@ -4,12 +4,18 @@ let client;
 let db;
 
 async function connectDatabase() {
-    if (!client){
-        client = new MongoClient(process.env.MONGO_URI, {});
-        await client.connect();
-        console.log(`Connected to MongoDB`);
-        db = client.db(process.env.DB_NAME || `test`); // Database name default to test
+    if (!client) {
+        const mongoURI = process.env.MONGO_URI || "mongodb+srv://mikelangelom0309_db_user:YayoYaya2113@nestmatch.meuxx7w.mongodb.net/?appName=NestMatch";  // Add tls=true explicitly
+        
+        client = new MongoClient(mongoURI);
+
+        await client.connect(); // Connect to the database
+        console.log("Connected to MongoDB");
+
+        // Get database
+        db = client.db(process.env.DB_NAME || "test");
     }
+
     return db;
 }
 
@@ -19,13 +25,6 @@ function getDB() {
     }
     return db;
 }
-
-// const db = {
-//     users: [
-//         {id: 1, name: "Alice", email: "alice@example.com"}
-//     ]
-
-// }
 
 module.exports = {
     connectDatabase,

@@ -7,6 +7,8 @@ const schema = require(`./schema.js`); // Can access schema.js
 const { connectDatabase } = require(`./database/connections.js`) // Can connect to database
 //await connectDatabase(); // Module.exports says the connectDatabase function is accessible everywhere
 const { ApolloServer } = require("apollo-server-express");
+const { authenticateToken } = require("./utils/auth");
+const { generateEmbedding } = require("./embeddingModel");
 
 const root = {
    async getAllHomes() {
@@ -54,6 +56,7 @@ module.exports = root; // Export the root resolver functions
 
 const app = express()
 
+//Apollo Server setup with schema and resolvers
 const server = new ApolloServer({
     schema,
     rootValue: root,
