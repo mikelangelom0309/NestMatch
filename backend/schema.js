@@ -8,8 +8,10 @@ const schema = buildSchema (`
         bedrooms: Int
         bathrooms: Int
         city: String
+        state: String
         sqft: Int
         description: String
+        createdAt: String
     }
 
     type Location {
@@ -30,6 +32,7 @@ const schema = buildSchema (`
         getAllHomes: [Home]
         getHome(id: ID!): Home
         searchHomes(query: String!): [Home]
+        aiSearchHomes(query: String!): [Home]
         getUser(id: ID!): User        
     }
 

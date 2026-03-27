@@ -4,7 +4,7 @@ const { exec } = require('child_process');
 //Generate embedding using Python script
 function generateEmbedding(query) {
     return new Promise((resolve, reject) => {
-        exec(`python3 embeddingModel.py "${query}"`, (error, stdout, stderr) => {
+        exec(`python ./backend/embeddingModel.py "${query}"`, (error, stdout, stderr) => {
             if (error) {
                 reject(`Error generating embedding: ${stderr}`);
             } else {

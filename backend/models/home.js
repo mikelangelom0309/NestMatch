@@ -8,7 +8,14 @@ const homeSchema = new mongoose.Schema({ // Home schema (Mongoose model) to inte
     bathrooms: {type: Number, required: true },
     sqft: {type: Number, required: true },
     city: {type: String, required: true },
+    state: {type: String, required: true },
     description: {type: String, required: true },
+
+    embedding: {
+        type: [Number], // Array of numbers to store the embedding vector
+        required: true
+    },
+
     createdAt: { type: Date, default: Date.now }
 });
 
