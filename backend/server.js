@@ -53,31 +53,21 @@ const root = {
      }).toArray();
    },
 
-   async aiSearchHomes({query}) {
-    const rawEmbedding = await generateEmbedding(query); // Generate embedding for the search query using the Python script
-    
-    //Handle possible 2D / 1D embeddings
-    const queryEmbedding = rawEmbedding[0]?.length ? rawEmbedding[0] : rawEmbedding; // Use the first element if it's a 2D array, otherwise use the raw embedding
-    const homes = await Home.find(); // Fetch all homes from the database
-    const homesWithSimilarity = []; // Array to store homes along with their similarity scores
+   async aiSearchHomes({ query }) {
+    try {
+    const queryEmbedding = await generateEmbedding(query);  // Get the query embedding
 
-    for(let i = 0; i < homes.length; i++) {
-        const home = homes[i];
-        if(!home.embedding) {
-            continue; // Skip homes that don't have an embedding
-        }
-        const similarity = cosineSimilarity(queryEmbedding, home.embedding); // Calculate cosine similarity between query embedding and home's embedding
-        const homeObj = home.toObject(); // Convert MongoDB document to plain JavaScript object
-        homeObj.similarity = similarity; // Add similarity score to the home object
-        homesWithSimilarity.push(homeObj); // Add the home object with similarity score to the array
+    const homes = await Home.find();  // Get all homes from DB
+    const rankedHomes = homes.map(home => {
+      const similarity = cosineSimilarity(queryEmbedding, home.embedding);  // Calculate similarity between query embedding and home embedding
+      return { ...home.toObject(), similarity };
+    }).sort((a, b) => b.similarity - a.similarity).slice(0, 5);
+
+    return rankedHomes;
+  } catch (error) {
+    console.error("Error in aiSearchHomes:", error);  // Log errors for debugging
+    throw new Error("Failed to search homes with AI.");
     }
-
-    homesWithSimilarity.sort((a, b) => {
-        return b.similarity - a.similarity
-    }); // Sort homes by similarity score descending order (highest first)
-
-    const topHomes = homesWithSimilarity.slice(0, 20); // Return the top 20 most similar homes
-    return topHomes;
     },
 
    async getUser({id}) {

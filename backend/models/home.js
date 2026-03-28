@@ -9,7 +9,12 @@ const homeSchema = new mongoose.Schema({ // Home schema (Mongoose model) to inte
     sqft: {type: Number, required: true },
     city: {type: String, required: true },
     state: {type: String, required: true },
+    zipCode: {type: String, required: true },
     description: {type: String, required: true },
+    latitude: {type: Number, required: true },
+    longitude: {type: Number, required: true },
+    propertyType: {type: String, required: true },
+    propertyURL: {type: String},
 
     embedding: {
         type: [Number], // Array of numbers to store the embedding vector

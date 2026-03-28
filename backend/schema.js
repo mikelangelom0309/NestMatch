@@ -12,6 +12,8 @@ const schema = buildSchema (`
         sqft: Int
         description: String
         createdAt: String
+        propertyType: String
+        propertyURL: String
     }
 
     type Location {
