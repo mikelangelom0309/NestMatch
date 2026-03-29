@@ -6,7 +6,7 @@ const schema = buildSchema (`
         address: String
         price: Int
         bedrooms: Int
-        bathrooms: Int
+        bathrooms: Float
         city: String
         state: String
         sqft: Int
@@ -35,7 +35,8 @@ const schema = buildSchema (`
         getHome(id: ID!): Home
         searchHomes(query: String!): [Home]
         aiSearchHomes(query: String!): [Home]
-        getUser(id: ID!): User        
+        getUser(id: ID!): User   
+        getQueryEmbedding: String     
     }
 
     type Mutation {

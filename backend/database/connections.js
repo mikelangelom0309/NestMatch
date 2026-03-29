@@ -9,12 +9,7 @@ async function connectDatabase() {
         const mongoURI = process.env.MONGO_URI || "mongodb+srv://mikelangelom0309_db_user:YayoYaya2113@nestmatch.meuxx7w.mongodb.net/?appName=NestMatch";
 
         // Initialize MongoDB Client with the URI
-        client = new MongoClient(mongoURI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            serverSelectTimeoutMS: 5000, // Optional: Set a timeout for server selection
-            socketTimeoutMS: 45000, // Optional: Set a timeout for socket operations
-        });
+        client = new MongoClient(mongoURI);
 
         await client.connect(); // Connect to the database
         console.log("Connected to MongoDB");

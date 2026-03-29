@@ -8,6 +8,7 @@ const { connectDatabase } = require(`./database/connections.js`)
 const { ApolloServer } = require("apollo-server-express");
 const { authenticateToken } = require("./utils/auth");
 const { generateEmbedding } = require("./embeddingModel");
+const mongoose = require("mongoose");
 
 const Home = require("./models/home.js");
 const User = require("./models/user.js");
@@ -53,20 +54,60 @@ const root = {
      }).toArray();
    },
 
+//    async getQueryEmbedding() {
+//     try {
+//         const embedding = await generateEmbedding("3 bed house with backyard");
+//         return `Embedding length: ${embedding.length}, first value: ${embedding[0]}`;
+//     } catch (error) {
+//         console.error("Embedding error:", error);
+//         return `Error: ${String(error)}`;
+//     }
+//     },
+async getQueryEmbedding() {
+    console.log("=== getQueryEmbedding called ===");
+    try {
+        console.log("Calling generateEmbedding...");
+        const embedding = await generateEmbedding("3 bed house with backyard");
+        console.log("Embedding result:", embedding);
+        console.log("Type:", typeof embedding);
+        const result = `Embedding length: ${embedding.length}, first value: ${embedding[0]}`;
+        console.log("Returning:", result);
+        return result;
+    } catch (error) {
+        console.error("CAUGHT ERROR:", error);
+        return `Error: ${String(error)}`;
+    }
+},
+
    async aiSearchHomes({ query }) {
     try {
-    const queryEmbedding = await generateEmbedding(query);  // Get the query embedding
+        console.log("=== aiSearchHomes called with query:", query);
+        
+        const queryEmbedding = await generateEmbedding(query);
+        console.log("Query embedding length:", queryEmbedding.length);
 
-    const homes = await Home.find();  // Get all homes from DB
-    const rankedHomes = homes.map(home => {
-      const similarity = cosineSimilarity(queryEmbedding, home.embedding);  // Calculate similarity between query embedding and home embedding
-      return { ...home.toObject(), similarity };
-    }).sort((a, b) => b.similarity - a.similarity).slice(0, 5);
+        const homes = await Home.find();
+        console.log("Homes found in DB:", homes.length);
+        
+        if (homes.length === 0) {
+            console.log("No homes found in database!");
+            return [];
+        }
 
-    return rankedHomes;
-  } catch (error) {
-    console.error("Error in aiSearchHomes:", error);  // Log errors for debugging
-    throw new Error("Failed to search homes with AI.");
+        console.log("First home embedding exists?", !!homes[0].embedding);
+        console.log("First home embedding length:", homes[0].embedding?.length);
+
+        const rankedHomes = homes.map(home => {
+            const similarity = cosineSimilarity(queryEmbedding, home.embedding);
+            return { ...home.toObject(), similarity };
+        }).sort((a, b) => b.similarity - a.similarity).slice(0, 5);
+
+        console.log("Top result:", rankedHomes[0]?.address, "similarity:", rankedHomes[0]?.similarity);
+        return rankedHomes;
+
+    } catch (error) {
+        console.error("FULL ERROR in aiSearchHomes:", error); // Now logs the real error
+        throw new Error("Failed to search homes with AI.");
     }
     },
 
@@ -111,6 +152,10 @@ async function startServer() {
     await connectDatabase();  // Wait for MongoDB connection
     console.log("Database connected successfully");
 
+    const mongoURI = process.env.MONGO_URI || "mongodb+srv://mikelangelom0309_db_user:YayoYaya2113@nestmatch.meuxx7w.mongodb.net/?appName=NestMatch";
+    await mongoose.connect(mongoURI);
+    console.log("Mongoose connected successfully");
+    
     // Start Apollo Server
     await server.start();  // Start the server asynchronously
 
