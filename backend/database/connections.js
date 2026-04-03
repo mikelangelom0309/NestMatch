@@ -15,7 +15,7 @@ async function connectDatabase() {
         console.log("Connected to MongoDB");
 
         // Get database
-        db = client.db(process.env.DB_NAME || "test"); // Default to 'test' if DB_NAME is not provided
+        db = client.db(process.env.DB_NAME || "NestMatch"); // Default to 'NestMatch' if DB_NAME is not provided
     }
 
     return db;

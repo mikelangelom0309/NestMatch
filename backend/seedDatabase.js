@@ -12,7 +12,7 @@ async function seedDatabase() {
     try {
         // Connect Mongoose directly instead of using connectDatabase()
         const mongoURI = process.env.MONGO_URI || "mongodb+srv://mikelangelom0309_db_user:YayoYaya2113@nestmatch.meuxx7w.mongodb.net/?appName=NestMatch";
-        await mongoose.connect(mongoURI);
+        await mongoose.connect(mongoURI, { dbName: "nestmatch" });
         console.log("Mongoose connected to MongoDB");
 
         // Clear existing homes

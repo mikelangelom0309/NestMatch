@@ -1,18 +1,13 @@
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 
-const client = new ApolloClient({
-    uri: 'http://localhost:5001/graphql',
-    cache: new InMemoryCache(),
+// This tells Apollo WHERE your backend server is running
+const httpLink = createHttpLink({
+  uri: 'http://localhost:5001/graphql', 
 });
 
-function App() {
-    return (
-        <ApolloProvider client={client}>
-        <div className="App">
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache(),
+});
 
-        </div>
-        </ApolloProvider>
-    );
-}
-
-export default App;
+export default client;

@@ -1,47 +1,46 @@
 import React, { useState } from 'react';
-import { useLazyQuery, gql } from '@apollo/client';
+import { useQuery, useLazyQuery } from '@apollo/client/react';
+import { AI_SEARCH_HOMES } from '../graphql/queries';
+import { useNavigate } from 'react-router-dom';
 
-// Tells Apollo what to ask the GraphQL backend for
-const AI_SEARCH_HOMES = gql`
-    query AiSearchHomes($query: String!) {
-        aiSearchHomes(query: $query) {
-            id
-            address
-            city
-            state
-            price
-            bedrooms
-            bathrooms
-            sqft
-            propertyType
-            similarity
-        }
-    }
-`;
-
-// Reusable child component — receives one home object as a "prop"
+// Reusable child component — receives one home object as a prop
 // Props are how parent components pass data down to children
 function HomeCard({ home }) {
+    const similarityValue = typeof home.similarity === 'number' ? home.similarity : 0;
+    const matchPercentage = Math.round(similarityValue * 100);
+
     return (
         <div style={styles.card}>
             <div style={styles.cardHeader}>
-                <span style={styles.propertyType}>{home.propertyType}</span>
+                <span style={styles.propertyType}>{home.propertyType || "Property"}</span>
                 <span style={styles.price}>
-                    ${home.price}<span style={styles.perMonth}>/mo</span>
+                    ${home.price || "0"}<span style={styles.perMonth}>/mo</span>
                 </span>
             </div>
-            <h3 style={styles.address}>{home.address}</h3>
-            <p style={styles.location}>{home.city}, {home.state}</p>
-            <div style={styles.details}>
-                <span>🛏 {home.bedrooms} bed</span>
-                <span>🛁 {home.bathrooms} bath</span>
-                <span>📐 {home.sqft} sqft</span>
-            </div>
-            {home.similarity && (
-                <div style={styles.similarity}>
-                    {Math.round(home.similarity * 100)}% match
-                </div>
+            {/* Fallback for Address and Location */}
+            <h3 style={styles.address}>{home.address || "No Address Provided"}</h3>
+            <p style={styles.location}>
+                {home.city || "Unknown City"}{home.state ? `, ${home.state}` : ""}
+            </p>
+
+            {home.propertyURL && (
+                <a href={home.propertyURL} target="_blank" rel="noopener noreferrer" style={styles.zillowLink}>
+                    View Listing
+                </a>
             )}
+
+            <div style={styles.details}>
+                <span>🛏 {home.bedrooms || 0} bed</span>
+                <span>🛁 {home.bathrooms || 0} bath</span>
+                <span>📐 {home.sqft || 0} sqft</span>
+            </div>
+
+            <div style={{
+                ...styles.similarity, 
+                color: matchPercentage > 70 ? '#2a7a2a' : '#888' 
+            }}>
+                {matchPercentage}% match
+            </div>
         </div>
     );
 }
@@ -50,9 +49,11 @@ function HomeCard({ home }) {
 function HomePage() {
     // useState: stores what the user typed — updates on every keystroke
     const [query, setQuery] = useState('');
+    const navigate = useNavigate();
+    const testUserId ="69cf6994d36f4c5105c5efc6";
 
     // useLazyQuery: like useQuery but only fires when searchHomes() is called
-    const [searchHomes, { loading, data, error }] = useLazyQuery(AI_SEARCH_HOMES);
+    const [searchHomes, { loading, data, error, called }] = useLazyQuery(AI_SEARCH_HOMES);
 
     function handleSearch() {
         if (!query.trim()) return;
@@ -65,6 +66,14 @@ function HomePage() {
 
     return (
         <div style={styles.page}>
+            <div style={styles.nav}>
+                <button
+                    onClick={() => navigate(`/profile/${testUserId}`)}
+                    style={styles.profileButton}
+                >
+                    My Profile
+                </button>
+            </div>
 
             {/* Header */}
             <div style={styles.header}>
@@ -114,7 +123,7 @@ function HomePage() {
             )}
 
             {/* Empty State */}
-            {data && data.aiSearchHomes.length === 0 && (
+            {called && data && data.aiSearchHomes.length === 0 && (
                 <p style={styles.empty}>
                     No homes found for "{query}". Try a different search.
                 </p>
@@ -132,6 +141,34 @@ function HomePage() {
 }
 
 const styles = {
+    nav: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        marginBottom: '20px',
+    },
+    profileButton: {
+        background: 'fff',
+        border: '1px solid #ddd',
+        borderRadius: '50%',
+        width: '40px',
+        height: '45px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        color: '#a50caa',
+        transition: 'all 0.2s ease',
+    },
+
+    zillowLink: {
+        display: 'block',
+        marginBottom: '12px',
+        color: '#006AFF',
+        textDecoration: 'none',
+        fontSize: '0.9rem',
+        fontWeight: 'bold',
+    },
     page: {
         maxWidth: '900px',
         margin: '0 auto',

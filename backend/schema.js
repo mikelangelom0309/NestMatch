@@ -14,6 +14,7 @@ const schema = buildSchema (`
         createdAt: String
         propertyType: String
         propertyURL: String
+        similarity: Float
     }
 
     type Location {
@@ -42,6 +43,9 @@ const schema = buildSchema (`
     type Mutation {
         addUser(name: String!, email: String!): User
         saveHome(userId: ID!, homeId: ID!): User
+        removeSavedHome(userId: ID!, homeId: ID!): User
+        updateUserName(userId: ID!, name: String!): User
+        updateUserEmail(userId: ID!, email: String!): User
     }
 `);
 

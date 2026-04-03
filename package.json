@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "@apollo/client": "^4.1.6",
+    "graphql": "^16.13.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.3.3"
+    "mongoose": "^9.3.3",
+    "react-router-dom": "^7.14.0"
   }
 }
